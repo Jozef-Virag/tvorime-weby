@@ -60,16 +60,16 @@ const serviceOptions = [
     </div>
 </section>
 
-<script type="module" is:inline>
-    const form = document.getElementById("contact-form");
+<script src="https://www.google.com/recaptcha/api.js?render=6LeAlM4rAAAAAGxdb69dWiEQp2TaRv5qLxMMjzow"></script>
 
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+<script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("contact-form");
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        const siteKey = "TU_TVOJ_PUBLIC_RECAPTCHA_SITE_KEY";
-
-        grecaptcha.ready(() => {
-            grecaptcha.execute(siteKey, { action: "submit" }).then(async (token) => {
+            grecaptcha.ready(async () => {
+                const token = grecaptcha.execute("6LeAlM4rAAAAAGxdb69dWiEQp2TaRv5qLxMMjzow", {action: "submit"});
                 document.getElementById("g-recaptcha-response").value = token;
 
                 const res = await fetch("/api/contact", {
@@ -92,5 +92,3 @@ const serviceOptions = [
         });
     });
 </script>
-
-<script src="https://www.google.com/recaptcha/api.js?render=TU_TVOJ_PUBLIC_RECAPTCHA_SITE_KEY"></script>
