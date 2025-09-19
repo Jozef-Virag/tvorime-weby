@@ -61,44 +61,47 @@ const serviceOptions = [
     </div>
 </section>
 
-<!-- reCAPTCHA script -->
+<form id="contact-form" class="grid md:grid-cols-2 gap-6">
+    <!-- tvoje polia: name, email, phone, service, message -->
+    <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" />
+
+    <div class="md:col-span-2 text-center">
+        <button type="submit">Odoslať správu</button>
+    </div>
+</form>
+
 <script type="module" is:inline>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("contact-form");
+    const form = document.getElementById("contact-form");
 
-        form.addEventListener("submit", async function (e) {
-            e.preventDefault();
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-            grecaptcha.ready(function () {
-                grecaptcha.execute(import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY, { action: "submit" }).then(function (token) {
-                    document.getElementById("g-recaptcha-response").value = token;
+        const siteKey = "6LeAlM4rAAAAAGxdb69dWiEQp2TaRv5qLxMMjzow";
 
-                    // POST request na serverless function
-                    fetch("/api/contact", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            name: form.name.value,
-                            email: form.email.value,
-                            phone: form.phone.value,
-                            service: form.service.value,
-                            message: form.message.value,
-                            "g-recaptcha-response": token
-                        })
+        grecaptcha.ready(() => {
+            grecaptcha.execute(siteKey, { action: "submit" }).then(async (token) => {
+                document.getElementById("g-recaptcha-response").value = token;
+
+                // odošli request na serverless function
+                const res = await fetch("/api/contact", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: form.name.value,
+                        email: form.email.value,
+                        phone: form.phone.value,
+                        service: form.service.value,
+                        message: form.message.value,
+                        token
                     })
-                        .then(res => res.json())
-                        .then(data => {
-                            alert(data.message); // môžeš nahradiť modálom
-                            if (res.ok) form.reset();
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            alert("Chyba pri odosielaní správy!");
-                        });
                 });
+
+                const data = await res.json();
+                alert(data.message);
+                if (res.ok) form.reset();
             });
         });
     });
 </script>
 
-<script src={`https://www.google.com/recaptcha/api.js?render=${import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY}`}></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LeAlM4rAAAAAGxdb69dWiEQp2TaRv5qLxMMjzow"></script>
