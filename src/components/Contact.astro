@@ -9,58 +9,46 @@ const serviceOptions = [
     { value: 'custom', label: 'Iné' }
 ];
 ---
+
 <section id="contact" class="py-24" aria-label="Kontaktný formulár">
     <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 md:p-12 reveal">
             <SectionHeader
-                title="Začnime spoluprácu"
-                description="Napíšte nám a my sa vám ozveme do 24 hodín"
+                    title="Začnime spoluprácu"
+                    description="Napíšte nám a my sa vám ozveme do 24 hodín"
             />
 
-            <form class="grid md:grid-cols-2 gap-6">
+            <!-- FORMULÁR -->
+            <form id="contact-form" class="grid md:grid-cols-2 gap-6">
                 <div class="md:col-span-1">
-                    <FormInput
-                        label="Meno a priezvisko"
-                        name="name"
-                        required={true}
-                    />
+                    <FormInput label="Meno a priezvisko" name="name" required={true} />
+                </div>
+                <div class="md:col-span-1">
+                    <FormInput label="Email" type="email" name="email" required={true} />
+                </div>
+                <div class="md:col-span-1">
+                    <FormInput label="Telefón" type="tel" name="phone" />
                 </div>
                 <div class="md:col-span-1">
                     <FormInput
-                        label="Email"
-                        type="email"
-                        name="email"
-                        required={true}
-                    />
-                </div>
-                <div class="md:col-span-1">
-                    <FormInput
-                        label="Telefón"
-                        type="tel"
-                        name="phone"
-                    />
-                </div>
-                <div class="md:col-span-1">
-                    <FormInput
-                        label="Typ služby"
-                        type="select"
-                        name="service"
-                        required={true}
-                        options={serviceOptions}
+                            label="Typ služby"
+                            type="select"
+                            name="service"
+                            required={true}
+                            options={serviceOptions}
                     />
                 </div>
                 <div class="md:col-span-2">
-                    <FormInput
-                        label="Správa"
-                        type="textarea"
-                        name="message"
-                        required={true}
-                    />
+                    <FormInput label="Správa" type="textarea" name="message" required={true} />
                 </div>
+
+                <!-- reCAPTCHA hidden field -->
+                <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" />
+
                 <div class="md:col-span-2 text-center">
                     <button
-                        type="submit"
-                        class="inline-flex items-center justify-center px-8 py-4 bg-cyan-500 text-white font-semibold rounded-full hover:bg-cyan-600 transition duration-300"
+                            type="submit"
+                            class="inline-flex items-center justify-center px-8 py-4 bg-cyan-500 text-white font-semibold rounded-full hover:bg-cyan-600 transition duration-300"
                     >
                         Odoslať správu
                         <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,3 +60,45 @@ const serviceOptions = [
         </div>
     </div>
 </section>
+
+<!-- reCAPTCHA script -->
+<script is:inline>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("contact-form");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            grecaptcha.ready(function () {
+                grecaptcha.execute(import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY, { action: "submit" }).then(function (token) {
+                    document.getElementById("g-recaptcha-response").value = token;
+
+                    // POST request na serverless function
+                    fetch("/api/contact", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            name: form.name.value,
+                            email: form.email.value,
+                            phone: form.phone.value,
+                            service: form.service.value,
+                            message: form.message.value,
+                            "g-recaptcha-response": token
+                        })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            alert(data.message); // môžeš nahradiť modálom
+                            if (res.ok) form.reset();
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert("Chyba pri odosielaní správy!");
+                        });
+                });
+            });
+        });
+    });
+</script>
+
+<script src={`https://www.google.com/recaptcha/api.js?render=${import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY}`}></script>
