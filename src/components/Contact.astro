@@ -41,8 +41,7 @@ const serviceOptions = [
                     <FormInput label="Správa" type="textarea" name="message" required={true} />
                 </div>
 
-                <!-- reCAPTCHA hidden field -->
-                <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" />
+                <input type="hidden" name="recaptcha" id="recaptcha-token" />
 
                 <div class="md:col-span-2 text-center">
                     <button
@@ -68,9 +67,22 @@ const serviceOptions = [
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
+            await new Promise((resolve) => {
+                if (typeof grecaptcha !== 'undefined') {
+                    resolve();
+                } else {
+                    const check = setInterval(() => {
+                        if (typeof grecaptcha !== 'undefined') {
+                            clearInterval(check);
+                            resolve();
+                        }
+                    }, 50);
+                }
+            });
+
             grecaptcha.ready(async () => {
-                const token = grecaptcha.execute("6LeAlM4rAAAAAGxdb69dWiEQp2TaRv5qLxMMjzow", {action: "submit"});
-                document.getElementById("g-recaptcha-response").value = token;
+                const token = await grecaptcha.execute("6LeAlM4rAAAAAGxdb69dWiEQp2TaRv5qLxMMjzow", { action: "submit" });
+                document.getElementById("recaptcha-token").value = token;
 
                 const res = await fetch("/api/contact", {
                     method: "POST",
@@ -81,7 +93,7 @@ const serviceOptions = [
                         phone: form.phone.value,
                         service: form.service.value,
                         message: form.message.value,
-                        token
+                        recaptcha: token
                     })
                 });
 

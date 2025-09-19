@@ -1,39 +1,48 @@
 import nodemailer from "nodemailer";
 
-export async function post({ request }) {
+export default async function handler(req, res) {
+    if (req.method !== "POST") {
+        return res.status(405).json({ message: "Method Not Allowed" });
+    }
+
     try {
-        const body = await request.json();
-        const { name, email, phone, service, message, "g-recaptcha-response": token } = body;
+        const body = await req.json();
+        const { name, email, phone, service, message, recaptcha } = body;
 
-        // 1️⃣ Overenie reCAPTCHA v3
-        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`;
-        const recaptchaRes = await fetch(verifyUrl, { method: "POST" });
-        const recaptchaData = await recaptchaRes.json();
+        const verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
+        const params = new URLSearchParams();
+        params.append("secret", process.env.RECAPTCHA_SECRET_KEY);
+        params.append("response", recaptcha);
 
-        if (!recaptchaData.success || recaptchaData.score < 0.5) {
-            return new Response(JSON.stringify({ message: "reCAPTCHA verification failed" }), { status: 400 });
-        }
-
-        // 2️⃣ Validácia povinných polí
-        if (!name || !email || !message) {
-            return new Response(JSON.stringify({ message: "Missing required fields" }), { status: 400 });
-        }
-
-        // 3️⃣ Nodemailer transport
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true,
-            auth: {
-                user: process.env.MAIL_USER, // tvoj Gmail
-                pass: process.env.MAIL_PASS, // App password
+        const recRes = await fetch(verifyUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
             },
+            body: params.toString(),
+        });
+        const recData = await recRes.json();
+
+        if (!recData.success || recData.score < 0.5) {
+            return res.status(400).json({ message: "Captcha verification failed" });
+        }
+
+        if (!name || !email || !message) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        // Nodemailer cez Gmail
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.MAIL_USER,
+                pass: process.env.MAIL_PASS
+            }
         });
 
-        // 4️⃣ Odoslanie e-mailu
         await transporter.sendMail({
             from: `"Web Kontakt" <${process.env.MAIL_USER}>`,
-            to: process.env.MY_EMAIL, // kam sa majú odosielať správy
+            to: process.env.MY_EMAIL,
             subject: `Nová správa z webu: ${service || "nezadaná služba"}`,
             text: `
 Meno: ${name}
@@ -42,12 +51,12 @@ Telefón: ${phone || "-"}
 Služba: ${service || "-"}
 Správa:
 ${message}
-      `,
+`
         });
 
-        return new Response(JSON.stringify({ message: "Email bol odoslaný ✅" }), { status: 200 });
+        return res.status(200).json({ message: "Email odoslaný ✅" });
     } catch (err) {
-        console.error(err);
-        return new Response(JSON.stringify({ message: "Server error" }), { status: 500 });
+        console.error("Contact API error:", err);
+        return res.status(500).json({ message: "Server error" });
     }
 }
