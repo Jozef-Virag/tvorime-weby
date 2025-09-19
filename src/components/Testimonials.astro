@@ -1,0 +1,100 @@
+---
+import SectionHeader from './shared/SectionHeader.astro';
+
+interface Testimonial {
+    name: string;
+    position: string;
+    company: string;
+    image: string;
+    text: string;
+    rating: number;
+}
+
+const testimonials: Testimonial[] = [
+    {
+        name: "M. Matejička",
+        position: "Majiteľ",
+        company: "Posilňovňa Nitra",
+        image: "/images/testimonials/avatar1.png",
+        text: "Profesionálny prístup a rýchla komunikácia. Web pre naše fitness centrum presiahol naše očakávania a máme vďaka nemu výrazne viac online rezervácií.",
+        rating: 5
+    },
+    {
+        name: "Jana Kováčová",
+        position: "Majiteľka",
+        company: "Kaviareň Nitra",
+        image: "/images/testimonials/avatar2.png",
+        text: "Luxnet vytvoril pre našu kaviareň krásnu webstránku, ktorá perfektne vystihuje atmosféru nášho podniku. Oceňujem najmä rýchlosť dodania a ochotu upraviť všetko podľa našich predstáv.",
+        rating: 5
+    },
+    {
+        name: "Martin Horváth",
+        position: "Majiteľ",
+        company: "Ecommerce",
+        image: "/images/testimonials/avatar3.png",
+        text: "S našim e-shopom sme maximálne spokojní. Systém je prehľadný, rýchly a hlavne - predaje nám po spustení novej verzie narástli o 45%.",
+        rating: 5
+    }
+];
+---
+<section class="py-24 bg-slate-50" aria-label="Referencie">
+    <div class="container mx-auto px-4">
+        <SectionHeader
+            title="Čo o nás hovoria klienti"
+            description="Pozrite sa, ako hodnotia spoluprácu s nami naši klienti"
+        />
+
+        <div class="grid md:grid-cols-3 gap-8 mt-16">
+            {testimonials.map((testimonial, index) => (
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 reveal" style={`transition-delay: ${index * 150}ms`}>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-full bg-slate-200 overflow-hidden">
+                            <img
+                                src={testimonial.image}
+                                alt={testimonial.name}
+                                class="w-full h-full object-cover"
+                                onError="this.src='https://ui-avatars.com/api/?name=${testimonial.name}&background=0057FF&color=fff'"
+                            />
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-900">{testimonial.name}</h3>
+                            <p class="text-sm text-slate-600">{testimonial.position}</p>
+                            <p class="text-sm text-cyan-500">{testimonial.company}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-1 mb-4">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <svg
+                                class={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-slate-200'}`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        ))}
+                    </div>
+
+                    <blockquote class="text-slate-700 italic">
+                        "{testimonial.text}"
+                    </blockquote>
+                </div>
+            ))}
+        </div>
+
+        <div class="mt-16 text-center reveal">
+            <p class="text-slate-600 mb-8">
+                Pripojte sa k našim spokojným klientom a posuňte svoj biznis na novú úroveň
+            </p>
+            <a
+                href="#contact"
+                class="inline-flex items-center justify-center px-8 py-4 bg-cyan-500 text-white font-semibold rounded-full hover:bg-cyan-600 transition duration-300"
+            >
+                Začnime spoluprácu
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>

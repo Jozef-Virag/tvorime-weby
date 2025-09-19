@@ -1,0 +1,14 @@
+---
+interface Props {
+    title: string;
+    description?: string;
+    centered?: boolean;
+    dark?: boolean;
+}
+
+const { title, description, centered = true, dark = false } = Astro.props;
+---
+<div class={`${centered ? 'text-center' : ''} max-w-3xl mx-auto mb-16`}>
+    <h2 class={`text-4xl font-bold ${dark ? 'text-white' : 'text-slate-900'} mb-6`}>{title}</h2>
+    {description && <p class={`text-lg ${dark ? 'text-slate-400' : 'text-slate-600'}`}>{description}</p>}
+</div>

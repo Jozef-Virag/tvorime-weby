@@ -1,0 +1,105 @@
+---
+interface Project {
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+    liveUrl: string;
+    tags: string[];
+}
+
+interface Project {
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+    liveUrl: string;
+    githubUrl?: string;
+    tags: string[];
+}
+
+const portfolioProjects: Project[] = [
+    {
+        id: 1,
+        title: "Mobility Univerzita Konštantína Filozofa v Nitre",
+        description: "Špecifikácia systému pre ponuku mobilít na Univerzite Konštantína Filozofa v Nitre.",
+        image: "/images/portfolio/mobility-UKF.jpg",
+        liveUrl: "#",
+        githubUrl: "https://github.com/Jozef-Virag/Team2-MobilityUkf",
+        tags: ["Laravel", "Blade", "PHP", "MySQL"]
+    },
+    {
+        id: 2,
+        title: "Luxnet IT Landing Page",
+        description: "Landing page pre Luxnet IT - fiktívny klient. Jednoduchý landing s moderným dizajnom.",
+        image: "/images/portfolio/luxnet-it.jpg",
+        liveUrl: "https://luxnet-it-landing-page.vercel.app/",
+        githubUrl: "https://github.com/Jozef-Virag/luxnet-it-landing-page",
+        tags: ["Vue.js", "TailwindCSS", "ShadCn"]
+    },
+    {
+        id: 3,
+        title: "Luxnet Cleaning Landing Page",
+        description: "Landing page pre čistiacu službu LuxNet.",
+        image: "/images/portfolio/luxnet-cleaning.jpg",
+        liveUrl: "https://luxnet-cleaning-landing-page.vercel.app/",
+        githubUrl: "https://github.com/Jozef-Virag/luxnet-cleaning-landing-page",
+        tags: ["Vue.js", "TailwindCSS"]
+    },
+    {
+        id: 4,
+        title: "Kaderníctvo Booking FE",
+        description: "Landing page s rezervačným systémom pre kaderníctvo.",
+        image: "/images/portfolio/kadernictvo.jpg",
+        liveUrl: "https://kadernictvobooking-fe.vercel.app/",
+        githubUrl: "https://github.com/Jozef-Virag/kadernictvobooking-fe",
+        tags: ["Vue.js", "Laravel", "MySQL"]
+    }
+];
+
+---
+<section id="portfolio" class="py-24" aria-label="Portfólio projektov">
+    <div class="container mx-auto px-4">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-4xl font-bold text-slate-900 mb-6">Naše projekty</h2>
+            <p class="text-lg text-slate-600">Pozrite si výber z našich najnovších projektov a presvedčte sa o kvalite našej práce.</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            {portfolioProjects.map((project) => (
+                <div class="group relative overflow-hidden rounded-2xl shadow-lg bg-white">
+                    <div class="relative">
+                        <img
+                            src={project.image}
+                            alt={project.title}
+                            class="w-full h-[300px] object-cover transition duration-300 group-hover:scale-110"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                            <div class="absolute bottom-0 left-0 right-0 p-6">
+                                <h3 class="text-xl font-bold text-white mb-2">{project.title}</h3>
+                                <p class="text-slate-200 mb-4">{project.description}</p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    {project.tags.map(tag => (
+                                        <span class="px-3 py-1 bg-white/10 rounded-full text-sm text-white">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                                <a
+                                    href={project.liveUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="inline-flex items-center text-white bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-full transition-colors duration-300"
+                                >
+                                    👉 Pozrieť live demo
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>

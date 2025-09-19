@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Sitemap: https://luxnet-web.sk/sitemap.xml
+
+# Prevent crawling of admin or sensitive areas
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/

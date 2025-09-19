@@ -1,0 +1,92 @@
+---
+interface Service {
+    title: string;
+    description: string;
+    icon: string;
+    price: number;
+    features: string[];
+    popular?: boolean;
+}
+
+const services: Service[] = [
+    {
+        title: "Landing Page",
+        description: "Jednoduchá a efektívna landing page s moderným dizajnom",
+        icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+        price: 249,
+        features: [
+            "1 unikátna stránka",
+            "Moderný responzívny dizajn",
+            "Kontaktný formulár",
+            "1 rok hosting ZDARMA"
+        ]
+    },
+    {
+        title: "Firemný web",
+        description: "Komplexné firemné webové stránky s SEO optimalizáciou",
+        icon: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+        price: 599,
+        features: [
+            "Až 5 unikátnych podstránok",
+            "Prémiový dizajn",
+            "SEO optimalizácia",
+            "Kontaktný formulár",
+            "2 roky hosting ZDARMA",
+            "SSL certifikát"
+        ],
+        popular: true
+    },
+    {
+        title: "E-shop",
+        description: "Profesionálny e-shop s administračným systémom",
+        icon: "M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z",
+        price: 999,
+        features: [
+            "Neobmedzený počet produktov",
+            "Administračný systém",
+            "Platobná brána",
+            "SEO optimalizácia",
+            "2 roky hosting ZDARMA"
+        ]
+    }
+];
+---
+<section id="services" class="py-24 bg-slate-50" aria-label="Naše služby">
+    <div class="container mx-auto px-4">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-4xl font-bold text-slate-900 mb-6">Naše služby</h2>
+            <p class="text-lg text-slate-600">Vytvárame komplexné webové riešenia presne podľa vašich potrieb. Každý projekt je jedinečný a zaslúži si individuálny prístup.</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            {services.map(service => (
+                <div class={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 ${service.popular ? 'transform md:scale-105 relative z-10' : ''}`}>
+                    <div class="w-16 h-16 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={service.icon}/>
+                        </svg>
+                    </div>
+                    {service.popular && (
+                        <div class="inline-block px-4 py-2 bg-cyan-500/10 text-cyan-500 rounded-full text-sm font-semibold mb-4">
+                            Najpopulárnejšie
+                        </div>
+                    )}
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">{service.title}</h3>
+                    <ul class="space-y-3 text-slate-600 mb-6">
+                        {service.features.map(feature => (
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 text-cyan-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {feature}
+                            </li>
+                        ))}
+                    </ul>
+                    <p class="text-3xl font-bold text-slate-900 mb-6">od {service.price}€</p>
+                    <a href="#contact" class="block w-full py-3 px-6 text-center bg-cyan-500 text-white rounded-full hover:bg-cyan-600 transition duration-300">
+                        Mám záujem
+                    </a>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>

@@ -1,11 +1,60 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Services from '../components/Services.astro';
+import Portfolio from '../components/Portfolio.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Process from '../components/Process.astro';
+import Contact from '../components/Contact.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// SEO data
+const seoTitle = "Luxnet – Profesionálna tvorba webstránok a e-shopov | Moderné webové riešenia";
+const seoDescription = "Špecializujeme sa na vývoj moderných webových riešení, e-shopov a aplikácií na mieru. Vytvárame inovatívne digitálne riešenia s dôrazom na výkon, dizajn a SEO.";
+const seoKeywords = "tvorba webstránok, tvorba e-shopov, webové aplikácie, SEO optimalizácia, responzívny dizajn, moderný web, landing page, firemný web";
+
+// Structured data for services
+const servicesData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Luxnet",
+    "url": "https://luxnet-web.sk",
+    "offers": [
+        {
+            "@type": "Offer",
+            "name": "Landing Page",
+            "description": "Jednoduchá a efektívna landing page s moderným dizajnom",
+            "price": "249",
+            "priceCurrency": "EUR"
+        },
+        {
+            "@type": "Offer",
+            "name": "Firemný web",
+            "description": "Komplexné firemné webové stránky s SEO optimalizáciou",
+            "price": "599",
+            "priceCurrency": "EUR"
+        },
+        {
+            "@type": "Offer",
+            "name": "E-shop",
+            "description": "Profesionálny e-shop s administračným systémom",
+            "price": "999",
+            "priceCurrency": "EUR"
+        }
+    ]
+}
 ---
+<Layout
+    title={seoTitle}
+    description={seoDescription}
+    keywords={seoKeywords}
+>
+    <Hero />
+    <Services />
+    <Portfolio />
+    <Testimonials />
+    <Process />
+    <Contact />
 
-<Layout>
-	<Welcome />
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(servicesData)} />
 </Layout>
