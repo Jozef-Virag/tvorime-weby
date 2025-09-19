@@ -1,14 +1,12 @@
+export const prerender = false;
 import nodemailer from "nodemailer";
 
-export default async function handler(req, res) {
-    if (req.method !== "POST") {
-        return res.status(405).json({ message: "Method Not Allowed" });
-    }
-
+export async function POST({ request }) {
     try {
-        const body = await req.json();
+        const body = await request.json();
         const { name, email, phone, service, message, recaptcha } = body;
 
+        // Overenie reCAPTCHA
         const verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
         const params = new URLSearchParams();
         params.append("secret", process.env.RECAPTCHA_SECRET_KEY);
@@ -24,11 +22,17 @@ export default async function handler(req, res) {
         const recData = await recRes.json();
 
         if (!recData.success || recData.score < 0.5) {
-            return res.status(400).json({ message: "Captcha verification failed" });
+            return new Response(
+                JSON.stringify({ message: "Captcha verification failed" }),
+                { status: 400, headers: { "Content-Type": "application/json" } }
+            );
         }
 
         if (!name || !email || !message) {
-            return res.status(400).json({ message: "Missing required fields" });
+            return new Response(
+                JSON.stringify({ message: "Missing required fields" }),
+                { status: 400, headers: { "Content-Type": "application/json" } }
+            );
         }
 
         // Nodemailer cez Gmail
@@ -36,8 +40,8 @@ export default async function handler(req, res) {
             service: "gmail",
             auth: {
                 user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASS
-            }
+                pass: process.env.MAIL_PASS,
+            },
         });
 
         await transporter.sendMail({
@@ -51,12 +55,18 @@ Telefón: ${phone || "-"}
 Služba: ${service || "-"}
 Správa:
 ${message}
-`
+`,
         });
 
-        return res.status(200).json({ message: "Email odoslaný ✅" });
+        return new Response(
+            JSON.stringify({ message: "Email odoslaný ✅" }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+        );
     } catch (err) {
         console.error("Contact API error:", err);
-        return res.status(500).json({ message: "Server error" });
+        return new Response(
+            JSON.stringify({ message: "Server error" }),
+            { status: 500, headers: { "Content-Type": "application/json" } }
+        );
     }
 }
