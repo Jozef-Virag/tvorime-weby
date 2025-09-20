@@ -23,14 +23,14 @@ export async function POST({ request }) {
 
         if (!recData.success || recData.score < 0.5) {
             return new Response(
-                JSON.stringify({ message: "Captcha verification failed" }),
+                JSON.stringify({ message: "Overenie Captcha zlyhalo" }),
                 { status: 400, headers: { "Content-Type": "application/json" } }
             );
         }
 
         if (!name || !email || !message) {
             return new Response(
-                JSON.stringify({ message: "Missing required fields" }),
+                JSON.stringify({ message: "Chýbajú povinné polia" }),
                 { status: 400, headers: { "Content-Type": "application/json" } }
             );
         }

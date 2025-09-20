@@ -45,6 +45,7 @@ const serviceOptions = [
 
                 <div class="md:col-span-2 text-center">
                     <button
+                            id="contact-submit"
                             type="submit"
                             class="inline-flex items-center justify-center px-8 py-4 bg-cyan-500 text-white font-semibold rounded-full hover:bg-cyan-600 transition duration-300"
                     >
@@ -59,20 +60,52 @@ const serviceOptions = [
     </div>
 </section>
 
+<!-- Modal -->
+<div id="modal" class="fixed inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 bg-black/25">
+    <div class="bg-white rounded-lg p-6 max-w-sm w-full text-center transform scale-95 transition-transform duration-300 shadow-lg">
+        <p id="modal-message" class="text-gray-800"></p>
+        <button id="modal-close" class="mt-4 px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600">OK</button>
+    </div>
+</div>
+
 <script src="https://www.google.com/recaptcha/api.js?render=6LeAlM4rAAAAAGxdb69dWiEQp2TaRv5qLxMMjzow" defer></script>
 
 <script is:inline>
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("contact-form");
+        const submitBtn = document.getElementById("contact-submit");
+        const modal = document.getElementById("modal");
+        const modalMessage = document.getElementById("modal-message");
+        const modalClose = document.getElementById("modal-close");
+
+        const showModal = (message) => {
+            modalMessage.textContent = message;
+            modal.classList.remove("pointer-events-none", "opacity-0");
+            modal.classList.add("opacity-100");
+            modal.querySelector("div").classList.remove("scale-95");
+            modal.querySelector("div").classList.add("scale-100");
+        };
+
+        modalClose.addEventListener("click", () => {
+            modal.classList.add("opacity-0");
+            modal.classList.remove("opacity-100");
+            modal.querySelector("div").classList.remove("scale-100");
+            modal.querySelector("div").classList.add("scale-95");
+
+            setTimeout(() => modal.classList.add("pointer-events-none"), 300);
+        });
+
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.classList.add("opacity-50", "cursor-not-allowed");
 
+            // wait for grecaptcha
             await new Promise((resolve) => {
-                if (typeof grecaptcha !== 'undefined') {
-                    resolve();
-                } else {
+                if (typeof grecaptcha !== "undefined") resolve();
+                else {
                     const check = setInterval(() => {
-                        if (typeof grecaptcha !== 'undefined') {
+                        if (typeof grecaptcha !== "undefined") {
                             clearInterval(check);
                             resolve();
                         }
@@ -84,22 +117,30 @@ const serviceOptions = [
                 const token = await grecaptcha.execute("6LeAlM4rAAAAAGxdb69dWiEQp2TaRv5qLxMMjzow", { action: "submit" });
                 document.getElementById("recaptcha-token").value = token;
 
-                const res = await fetch("/api/contact", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name: form.name.value,
-                        email: form.email.value,
-                        phone: form.phone.value,
-                        service: form.service.value,
-                        message: form.message.value,
-                        recaptcha: token
-                    })
-                });
+                try {
+                    const res = await fetch("/api/contact", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            name: form.name.value,
+                            email: form.email.value,
+                            phone: form.phone.value,
+                            service: form.service.value,
+                            message: form.message.value,
+                            recaptcha: token
+                        })
+                    });
 
-                const data = await res.json();
-                alert(data.message);
-                if (res.ok) form.reset();
+                    const data = await res.json();
+                    showModal(data.message);
+                    if (res.ok) form.reset();
+                } catch (err) {
+                    showModal("Chyba pri odosielaní, skúste neskôr.");
+                    console.error(err);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+                }
             });
         });
     });
