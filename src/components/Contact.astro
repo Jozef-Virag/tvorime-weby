@@ -20,13 +20,13 @@ const serviceOptions = [
 
             <form id="contact-form" class="grid md:grid-cols-2 gap-6">
                 <div class="md:col-span-1">
-                    <FormInput label="Meno a priezvisko" name="name" required={true} />
+                    <FormInput label="Meno a priezvisko" name="name" required={true} minlength={3} maxlength={100} />
                 </div>
                 <div class="md:col-span-1">
-                    <FormInput label="Email" type="email" name="email" required={true} />
+                    <FormInput label="Email" type="email" name="email" required={true} maxlength={150} />
                 </div>
                 <div class="md:col-span-1">
-                    <FormInput label="Telefón" type="tel" name="phone" />
+                    <FormInput label="Telefón" type="tel" name="phone" pattern="^\+?[0-9\s\-]{7,20}$" />
                 </div>
                 <div class="md:col-span-1">
                     <FormInput
@@ -38,7 +38,7 @@ const serviceOptions = [
                     />
                 </div>
                 <div class="md:col-span-2">
-                    <FormInput label="Správa" type="textarea" name="message" required={true} />
+                    <FormInput label="Správa" type="textarea" name="message" required={true} minlength={10} maxlength={2000} />
                 </div>
 
                 <input type="hidden" name="recaptcha" id="recaptcha-token" />
@@ -47,7 +47,7 @@ const serviceOptions = [
                     <button
                             id="contact-submit"
                             type="submit"
-                            class="inline-flex items-center justify-center px-8 py-4 bg-cyan-500 text-white font-semibold rounded-full hover:bg-cyan-600 transition duration-300"
+                            class="inline-flex items-center justify-center px-8 py-4 bg-cyan-500 text-white font-semibold rounded-full hover:bg-cyan-600 transition duration-300 cursor-pointer"
                     >
                         Odoslať správu
                         <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

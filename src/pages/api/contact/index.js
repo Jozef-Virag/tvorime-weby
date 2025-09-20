@@ -6,7 +6,7 @@ export async function POST({ request }) {
         const body = await request.json();
         const { name, email, phone, service, message, recaptcha } = body;
 
-        // Overenie reCAPTCHA
+        // --- Overenie reCAPTCHA ---
         const verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
         const params = new URLSearchParams();
         params.append("secret", process.env.RECAPTCHA_SECRET_KEY);
@@ -14,28 +14,56 @@ export async function POST({ request }) {
 
         const recRes = await fetch(verifyUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: params.toString(),
         });
-        const recData = await recRes.json();
 
+        const recData = await recRes.json();
         if (!recData.success || recData.score < 0.5) {
             return new Response(
-                JSON.stringify({ message: "Overenie Captcha zlyhalo" }),
+                JSON.stringify({ message: "Overenie reCAPTCHA zlyhalo. Skúste znova." }),
                 { status: 400, headers: { "Content-Type": "application/json" } }
             );
         }
 
+        // --- Validácia vstupov ---
         if (!name || !email || !message) {
             return new Response(
-                JSON.stringify({ message: "Chýbajú povinné polia" }),
+                JSON.stringify({ message: "Prosím, vyplňte všetky povinné polia." }),
                 { status: 400, headers: { "Content-Type": "application/json" } }
             );
         }
 
-        // Nodemailer cez Gmail
+        // Dĺžkové limity
+        if (name.length < 3 || name.length > 100) {
+            return new Response(
+                JSON.stringify({ message: "Meno musí mať 3–100 znakov." }),
+                { status: 400, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        if (email.length > 150) {
+            return new Response(
+                JSON.stringify({ message: "Email je príliš dlhý (max. 150 znakov)." }),
+                { status: 400, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        if (message.length < 10 || message.length > 2000) {
+            return new Response(
+                JSON.stringify({ message: "Správa musí mať 10–2000 znakov." }),
+                { status: 400, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        if (phone && !/^\+?[0-9\s\-]{7,20}$/.test(phone)) {
+            return new Response(
+                JSON.stringify({ message: "Telefónne číslo má nesprávny formát." }),
+                { status: 400, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        // --- Odoslanie mailu cez Nodemailer ---
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -55,17 +83,17 @@ Telefón: ${phone || "-"}
 Služba: ${service || "-"}
 Správa:
 ${message}
-`,
+      `,
         });
 
         return new Response(
-            JSON.stringify({ message: "Email odoslaný ✅" }),
+            JSON.stringify({ message: "Správa bola úspešne odoslaná ✅" }),
             { status: 200, headers: { "Content-Type": "application/json" } }
         );
     } catch (err) {
         console.error("Contact API error:", err);
         return new Response(
-            JSON.stringify({ message: "Server error" }),
+            JSON.stringify({ message: "Nastala chyba na serveri. Skúste neskôr." }),
             { status: 500, headers: { "Content-Type": "application/json" } }
         );
     }
