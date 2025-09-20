@@ -17,7 +17,6 @@ export async function POST({ request }) {
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: params.toString(),
         });
-
         const recData = await recRes.json();
         if (!recData.success || recData.score < 0.5) {
             return new Response(
@@ -26,7 +25,7 @@ export async function POST({ request }) {
             );
         }
 
-        // --- Validácia vstupov ---
+        // --- Validácia povinných polí ---
         if (!name || !email || !message) {
             return new Response(
                 JSON.stringify({ message: "Prosím, vyplňte všetky povinné polia." }),
@@ -34,7 +33,7 @@ export async function POST({ request }) {
             );
         }
 
-        // Dĺžkové limity
+        // --- Dĺžkové limity ---
         if (name.length < 3 || name.length > 100) {
             return new Response(
                 JSON.stringify({ message: "Meno musí mať 3–100 znakov." }),
@@ -56,9 +55,10 @@ export async function POST({ request }) {
             );
         }
 
-        if (phone && !/^\+?[0-9\s\-]{7,20}$/.test(phone)) {
+        // --- Formát telefónu ---
+        if (phone && !/^09[0-9]{2}\s?[0-9]{3}\s?[0-9]{3}$/.test(phone)) {
             return new Response(
-                JSON.stringify({ message: "Telefónne číslo má nesprávny formát." }),
+                JSON.stringify({ message: "Telefónne číslo musí byť v tvare 09xx xxx xxx." }),
                 { status: 400, headers: { "Content-Type": "application/json" } }
             );
         }
