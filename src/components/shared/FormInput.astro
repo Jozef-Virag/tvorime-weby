@@ -9,6 +9,7 @@ interface Props {
     minlength?: number;
     maxlength?: number;
     pattern?: string;
+    title?: string;
 }
 
 const {
@@ -20,7 +21,8 @@ const {
     rows = 6,
     minlength,
     maxlength,
-    pattern
+    pattern,
+    title
 } = Astro.props;
 ---
 <div class="w-full">
@@ -60,6 +62,7 @@ const {
                     minlength={minlength}
                     maxlength={maxlength}
                     pattern={pattern}
+                    title={title}
             />
     )}
 </div>
