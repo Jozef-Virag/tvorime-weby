@@ -7,6 +7,7 @@ import Testimonials from '../components/Testimonials.astro';
 import Process from '../components/Process.astro';
 import Contact from '../components/Contact.astro';
 import About from "../components/About.astro";
+import Analytics from '@vercel/analytics/astro';
 
 // SEO data
 const seoTitle = "Tvoríme Weby – Profesionálna tvorba webov a e-shopov";
@@ -57,6 +58,7 @@ const servicesData = {
     <Testimonials />
     <Process />
     <Contact />
+    <Analytics />
 
     <!-- Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(servicesData)} />
